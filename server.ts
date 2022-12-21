@@ -1,23 +1,23 @@
-const listener: Deno.Listener = Deno.listen({ port: 8000 });
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
-console.log("http://localhost:8000/");
+const BOOK_ROUTE = new URLPattern({ pathname: "/entry/:id" });
 
-async function handle(conn: Deno.Conn): Promise<void> {
+function handler(req: Request): Response {
 
-  const requests: Deno.HttpConn = Deno.serveHttp(conn);
+  const match = BOOK_ROUTE.exec(req.url);
 
-  for await (const { respondWith } of requests) {
+  if (match) {
 
-    respondWith(new Response("Hello world"));
+    const id = match.pathname.groups.id;
+
+    return new Response(`Entry id ${id}`);
 
   }
 
-}
-
-for await (const conn of listener) {
-
-  console.log('Listen: ', listener.addr, listener.rid)
-
-  handle(conn);
+  return new Response('Not found (try /entry/1)', {
+    status: 404,
+  });
 
 }
+
+serve(handler);
