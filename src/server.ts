@@ -1,5 +1,4 @@
-import { promisify } from 'promisify';
-import { serve } from 'serve';
+import { promisify, serve } from './deps.ts'
 
 function getData(cb: (time: number) => void): void {
 
