@@ -1,6 +1,7 @@
-import { promisify } from 'https://deno.land/x/promisify/mod.ts';
+import { promisify } from 'https://deno.land/x/promisify@v0.1.0/mod.ts';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
-function getAsyncData(cb: (time: number) => void): void {
+function getData(cb: (time: number) => void): void {
 
   const createTimeout = () => {
 
@@ -22,38 +23,70 @@ function getAsyncData(cb: (time: number) => void): void {
 
 }
 
-const getDataAsync = promisify(getAsyncData);
+async function* getNumbers(initialNumber = 0) {
+
+  yield initialNumber;
+
+}
+
+const delayedResponses = {
+
+  delays: [500, 1300, 3500],
+
+  wait(delay: number): Promise<number> {
+
+    return new Promise(resolve => {
+      setTimeout(resolve, delay);
+    });
+
+  },
+
+  async *[Symbol.asyncIterator]() {
+
+    for (const delay of this.delays) {
+
+      await this.wait(delay);
+      yield `Delayed response for ${delay} milliseconds`;
+
+    }
+
+  }
+
+};
+
+const getDataAsync = promisify(getData);
 
 // Non-blocker
 // console.log(await getDataAsync());
 
-// Blocker
-for await (const time of getDataAsync()) {
+(async () => {
 
-  console.log(time);
+  for await (const message of delayedResponses) {
 
-}
-
-const listener: Deno.Listener = Deno.listen({ port: 8000 });
-
-console.log('http://localhost:8000/');
-
-async function handle(conn: Deno.Conn): Promise<void> {
-
-  const requests: Deno.HttpConn = Deno.serveHttp(conn);
-
-  for await (const { respondWith } of requests) {
-
-    respondWith(new Response('Hello world'));
+    console.log(message);
 
   }
 
+})();
+
+const BOOK_ROUTE = new URLPattern({ pathname: "/entry/:id" });
+
+function handler(req: Request): Response {
+
+  const match = BOOK_ROUTE.exec(req.url);
+
+  if (match) {
+
+    const id = match.pathname.groups.id;
+
+    return new Response(`Entry id ${id}`);
+
+  }
+
+  return new Response('Not found (try /entry/1)', {
+    status: 404,
+  });
+
 }
 
-for await (const conn of listener) {
-
-  console.log('Listen: ', listener.addr, listener.rid);
-
-  handle(conn);
-
-}
+serve(handler);
