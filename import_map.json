@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "promisify": "https://deno.land/x/promisify@v0.1.0/mod.ts",
+    "serve": "https://deno.land/std@0.168.0/http/server.ts"
+  }
+}

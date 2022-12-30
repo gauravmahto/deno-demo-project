@@ -1,5 +1,5 @@
-import { promisify } from 'https://deno.land/x/promisify@v0.1.0/mod.ts';
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { promisify } from 'promisify';
+import { serve } from 'serve';
 
 function getData(cb: (time: number) => void): void {
 
@@ -69,7 +69,7 @@ const getDataAsync = promisify(getData);
 
 })();
 
-const BOOK_ROUTE = new URLPattern({ pathname: "/entry/:id" });
+const BOOK_ROUTE = new URLPattern({ pathname: '/entry/:id' });
 
 function handler(req: Request): Response {
 
