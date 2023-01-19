@@ -1,15 +1,14 @@
-import { createClient } from 'npm:redis@^4.5';
+import { connect, Redis, RedisValue, SetOpts } from 'redis/mod.ts';
 
 import redisConf from '../redis-conf.json' assert {type: 'json'};
 
-// make a connection to the local instance of redis
-const client = createClient(redisConf);
+let redis: Redis;
 
 export const initializeConnection = async () => {
 
   try {
 
-    await client.connect();
+    redis = await connect(redisConf);
 
   } catch (error) {
 
@@ -19,4 +18,22 @@ export const initializeConnection = async () => {
 
 };
 
-export const isConnectionReady = () => client.isReady;
+export const set = async (key: string, value: RedisValue, options?: SetOpts) => {
+
+  if (typeof redis !== 'undefined') {
+
+    return await redis.set(key, value, options);
+
+  }
+
+};
+
+export const get = async (key: string) => {
+
+  if (typeof redis !== 'undefined') {
+
+    return await redis.get(key);
+
+  }
+
+};
