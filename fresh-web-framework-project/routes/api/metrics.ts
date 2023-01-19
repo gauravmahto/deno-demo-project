@@ -9,6 +9,8 @@ export const handler = async (_req: Request, _ctx: HandlerContext): Promise<Resp
 
   return new Response(`
   Bucket 1 Length - ${bucket1.length}
-  Bucket 2 Length - ${bucket2.length}`);
+  Bucket 2 Length - ${bucket2.length}
+  Bucket 1 % - ${bucket1.length / (bucket1.length + bucket2.length)}
+  Bucket 2 % - ${bucket2.length / (bucket1.length + bucket2.length)}`);
 
 };
